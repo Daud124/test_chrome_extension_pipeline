@@ -1,0 +1,36 @@
+name: Chrome Web Store Upload
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build project
+      run: npm run build  # Your build command
+
+    - name: Zip build folder
+      run: zip -r package.zip ./dist  # Replace "./dist" with your folder path
+
+    - name: Upload to Chrome Web Store
+      uses: FoxyIntegrations/chrome-webstore-upload@v1
+      with:
+        extensionId: ${{ secrets.CHROME_EXTENSION_ID }}
+        clientId: ${{ secrets.CHROME_CLIENT_ID }}
+        clientSecret: ${{ secrets.CHROME_CLIENT_SECRET }}
+        refreshToken: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        zipFile: package.zip
